@@ -1,3 +1,4 @@
+-- Active: 1772300552417@@127.0.0.1@5432@assignment2
 /*
   Which bus stop has the largest population within 800 meters? As a rough
   estimation, consider any block group that intersects the buffer as being part
@@ -24,7 +25,6 @@ septa_bus_stop_surrounding_population as (
     group by stops.stop_id
 )
 
-
 select
     stops.stop_id,
     stops.stop_name,
@@ -32,4 +32,4 @@ select
 from septa_bus_stop_surrounding_population as pop
 inner join septa.bus_stops as stops using (stop_id)
 order by pop.estimated_pop_800m desc
-limit 8
+limit 8;
