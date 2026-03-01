@@ -24,6 +24,7 @@ septa_bus_stop_surrounding_population as (
     group by stops.stop_id
 )
 
+
 select
     stops.stop_id,
     stops.stop_name,

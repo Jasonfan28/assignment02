@@ -101,14 +101,14 @@ There are several datasets that are prescribed for you to use in this part. Belo
         ```bash
         ogr2ogr \
             -f "PostgreSQL" \
-            PG:"host=localhost port=$PGPORT dbname=$PGNAME user=$PGUSER password=$PGPASS" \
+            PG:"host=localhost port=5432 dbname=assignment2 user=postgres password=P123i,./g456"\
             -nln phl.pwd_parcels \
             -nlt MULTIPOLYGON \
             -t_srs EPSG:4326 \
             -lco GEOMETRY_NAME=geog \
             -lco GEOM_TYPE=GEOGRAPHY \
             -overwrite \
-            "${DATA_DIR}/phl_pwd_parcels/PWD_PARCELS.shp"
+            "${DATA_DIR}/data/phl_pwd_parcels/PWD_PARCELS.shp"
         ```
         _(remember to replace the variables with the appropriate values, and replace the backslashes (`\`) with backticks (`` ` ``) if you're using PowerShell)_
 
@@ -118,28 +118,29 @@ There are several datasets that are prescribed for you to use in this part. Belo
         ```bash
         ogr2ogr \
             -f "PostgreSQL" \
-            PG:"host=localhost port=$PGPORT dbname=$PGNAME user=$PGUSER password=$PGPASS" \
+            PG:"host=localhost port=5432 dbname=assignment2 user=postgres password=P123i,./g456"\
             -nln phl.neighborhoods \
             -nlt MULTIPOLYGON \
             -lco GEOMETRY_NAME=geog \
             -lco GEOM_TYPE=GEOGRAPHY \
             -overwrite \
-            "${DATA_DIR}/Neighborhoods_Philadelphia.geojson"
+            "${DATA_DIR}/philadelphia-neighborhoods/philadelphia-neighborhoods.geojson"
         ```
+        
         _(remember to replace the variables with the appropriate values, and replace the backslashes (`\`) with backticks (`` ` ``) if you're using PowerShell)_
 *   `census.blockgroups_2020` ([Census TIGER FTP](https://www2.census.gov/geo/tiger/TIGER2020/BG/) -- Each state has it's own file; Use file number `42` for PA)
     *   In the tests, this data will be loaded in with a geography column named `geog`, and all field names will be lowercased. If you use `ogr2ogr` to load the file, I recommend you use the following options:
         ```bash
         ogr2ogr \
             -f "PostgreSQL" \
-            PG:"host=localhost port=$PGPORT dbname=$PGNAME user=$PGUSER password=$PGPASS" \
+            PG:"host=localhost port=5432 dbname=assignment2 user=postgres password=P123i,./g456" \
             -nln census.blockgroups_2020 \
             -nlt MULTIPOLYGON \
             -t_srs EPSG:4326 \
             -lco GEOMETRY_NAME=geog \
             -lco GEOM_TYPE=GEOGRAPHY \
             -overwrite \
-            "$DATADIR/census_blockgroups_2020/tl_2020_42_bg.shp"
+            "${DATA_DIR}/data/tl_2020_42_bg/tl_2020_42_bg.shp"
         ```
         _(remember to replace the variables with the appropriate values, and replace the backslashes (`\`) with backticks (`` ` ``) if you're using PowerShell)_
 

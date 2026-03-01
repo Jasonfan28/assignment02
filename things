@@ -1,0 +1,60 @@
+#bus stops
+csvsql \
+  --db "postgresql://postgres:P123i,./g456@localhost:5432/assignment2" \
+  --insert \
+  --overwrite \
+  --create-if-not-exists \
+  --db-schema "septa" \
+  --tables "bus_stops" \
+  "/f/GitHub/assignment02/data/gtfs/google_bus/stops.txt"
+
+#bus routs
+csvsql \
+  --db "postgresql://postgres:P123i,./g456@localhost:5432/assignment2" \
+  --insert \
+  --overwrite \
+  --create-if-not-exists \
+  --db-schema "septa" \
+  --tables "bus_routes" \
+  "/f/GitHub/assignment02/data/gtfs/google_bus/routes.txt"
+
+#bus trips
+csvsql \
+  --db "postgresql://postgres:P123i,./g456@localhost:5432/assignment2" \
+  --insert \
+  --overwrite \
+  --create-if-not-exists \
+  --db-schema "septa" \
+  --tables "bus_trips" \
+  "/f/GitHub/assignment02/data/gtfs/google_bus/trips.txt"
+
+#bus shapes
+csvsql \
+  --db "postgresql://postgres:P123i,./g456@localhost:5432/assignment2" \
+  --insert \
+  --overwrite \
+  --create-if-not-exists \
+  --db-schema "septa" \
+  --tables "bus_shapes" \
+  "/f/GitHub/assignment02/data/gtfs/google_bus/shapes.txt"
+
+#rail stops
+csvsql \
+  --db "postgresql://postgres:P123i,./g456@localhost:5432/assignment2" \
+  --insert \
+  --overwrite \
+  --create-if-not-exists \
+  --db-schema "septa" \
+  --tables "rail_stops" \
+  "/f/GitHub/assignment02/data/gtfs/google_rail/stops.txt"
+
+#census pop
+
+csvsql \
+  --db "postgresql://postgres:P123i,./g456@localhost:5432/assignment2" \
+  --insert \
+  --overwrite \
+  --create-if-not-exists \
+  --db-schema "census" \
+  --tables "population_2020" \
+  "${DATA_DIR}/data/DECENNIALPL2020/DECENNIALPL2020Dataclean.csv"
