@@ -26,7 +26,7 @@ the assignment README.
 Finally, you can run this file either by copying it all into PG Admin, or by
 running the following command from the command line:
 
-    psql -U postgres -d <YOUR_DATABASE_NAME> -f db_structure.sql
+    psql -U postgres -d assignment2 -f db_structure.sql
 
 */
 
