@@ -23,6 +23,7 @@
     ```
 */
 
+set search_path = public;
 
 WITH shape_geoms AS (
     SELECT
@@ -31,7 +32,7 @@ WITH shape_geoms AS (
             ST_SetSRID(ST_MakePoint(shape_pt_lon, shape_pt_lat), 4326) 
             ORDER BY shape_pt_sequence
         )::geography AS shape_geom
-    FROM bus_shapes
+    FROM septa.bus_shapes
     GROUP BY shape_id
 ),
 shape_lengths AS (
@@ -49,8 +50,8 @@ longest_trips_per_route AS (
             PARTITION BY r.route_short_name 
             ORDER BY sl.shape_length DESC
         ) AS rn
-    FROM bus_trips t
-    JOIN bus_routes r ON t.route_id = r.route_id
+    FROM septa.bus_trips t
+    JOIN septa.bus_routes r ON t.route_id = r.route_id
     JOIN shape_lengths sl ON t.shape_id = sl.shape_id
 )
 
