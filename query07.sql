@@ -1,10 +1,9 @@
 /*
 7.  What are the bottom five neighborhoods according to your accessibility metric?
 
-    Accessibility metric: ratio of accessible stops (wheelchair_boarding = 1) to
-    all stops with known status (wheelchair_boarding = 1 or 2).
-    Only neighborhoods that have at least one stop with known status are included.
 */
+
+set search_path = public;
 
 WITH stop_neighborhood AS (
     SELECT

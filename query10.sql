@@ -2,16 +2,9 @@
 10. Build a stop_desc for each rail stop describing its location relative to
     the nearest Philadelphia neighborhood centroid and the cardinal direction
     from that centroid to the stop.
-
-    Description format:
-      "<distance> meters <direction> of <neighborhood name> neighborhood center"
-    e.g., "423 meters NE of Rittenhouse Square neighborhood center"
-
-    Datasets used:
-      - septa.rail_stops (SEPTA GTFS)
-      - phl.neighborhoods (OpenDataPhilly:
-          https://github.com/opendataphilly/open-geo-data/tree/master/philadelphia-neighborhoods)
 */
+
+set search_path = public;
 
 WITH rail_stop_geog AS (
     SELECT
