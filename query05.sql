@@ -1,11 +1,45 @@
 /*
-5.  Rate neighborhoods by their bus stop accessibility for wheelchairs. Use OpenDataPhilly's neighborhood dataset along with an appropriate dataset from the Septa GTFS bus feed. Use the [GTFS documentation](https://gtfs.org/reference/static/) for help. Use some creativity in the metric you devise in rating neighborhoods.
+5.  Rate neighborhoods by their bus stop accessibility for wheelchairs. Use
+    OpenDataPhilly's neighborhood dataset along with an appropriate dataset from
+    the Septa GTFS bus feed.
 
-    _NOTE: There is no automated test for this question, as there's no one right answer. With urban data analysis, this is frequently the case._
+    Accessibility metric: The ratio of wheelchair-accessible stops to all stops
+    with *known* accessibility status (wheelchair_boarding = 1 or 2) within each
+    neighborhood. Stops with wheelchair_boarding = 0 (unknown) are excluded from
+    the denominator so they don't artificially dilute the score.
 
-    Discuss your accessibility metric and how you arrived at it below:
-
-    **Description:**
+    A score of 1.0 means every stop with known status is accessible; 0.0 means
+    none are. Neighborhoods with no stops of known status receive NULL.
 */
 
+WITH stop_neighborhood AS (
+    SELECT
+        n.mapname AS neighborhood_name,
+        s.stop_id,
+        s.wheelchair_boarding
+    FROM phl.neighborhoods AS n
+    JOIN septa.bus_stops AS s
+        ON ST_Within(s.geog::geometry, n.geog::geometry)
+),
 
+neighborhood_stats AS (
+    SELECT
+        neighborhood_name,
+        COUNT(*) AS total_stops,
+        SUM(CASE WHEN wheelchair_boarding = 1 THEN 1 ELSE 0 END)::integer AS num_bus_stops_accessible,
+        SUM(CASE WHEN wheelchair_boarding = 2 THEN 1 ELSE 0 END)::integer AS num_bus_stops_inaccessible
+    FROM stop_neighborhood
+    GROUP BY neighborhood_name
+)
+
+SELECT
+    neighborhood_name,
+    ROUND(
+        num_bus_stops_accessible::numeric
+        / NULLIF(num_bus_stops_accessible + num_bus_stops_inaccessible, 0),
+        4
+    ) AS accessibility_metric,
+    num_bus_stops_accessible,
+    num_bus_stops_inaccessible
+FROM neighborhood_stats
+ORDER BY accessibility_metric DESC NULLS LAST;

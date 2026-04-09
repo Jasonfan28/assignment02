@@ -1,16 +1,83 @@
-10. You're tasked with giving more contextual information to rail stops to fill the `stop_desc` field in a GTFS feed. Using any of the data sets above, PostGIS functions (e.g., `ST_Distance`, `ST_Azimuth`, etc.), and PostgreSQL string functions, build a description (alias as `stop_desc`) for each stop. Feel free to supplement with other datasets (must provide link to data used so it's reproducible), and other methods of describing the relationships. SQL's `CASE` statements may be helpful for some operations.
+/*
+10. Build a stop_desc for each rail stop describing its location relative to
+    the nearest Philadelphia neighborhood centroid and the cardinal direction
+    from that centroid to the stop.
 
-    **Structure:**
-    ```sql
+    Description format:
+      "<distance> meters <direction> of <neighborhood name> neighborhood center"
+    e.g., "423 meters NE of Rittenhouse Square neighborhood center"
+
+    Datasets used:
+      - septa.rail_stops (SEPTA GTFS)
+      - phl.neighborhoods (OpenDataPhilly:
+          https://github.com/opendataphilly/open-geo-data/tree/master/philadelphia-neighborhoods)
+*/
+
+WITH rail_stop_geog AS (
+    SELECT
+        stop_id,
+        stop_name,
+        stop_lon,
+        stop_lat,
+        ST_SetSRID(ST_MakePoint(stop_lon, stop_lat), 4326)::geography AS geog
+    FROM septa.rail_stops
+),
+
+nearest_neighborhood AS (
+    SELECT DISTINCT ON (rs.stop_id)
+        rs.stop_id,
+        rs.stop_name,
+        rs.stop_lon,
+        rs.stop_lat,
+        rs.geog AS stop_geog,
+        n.mapname AS neighborhood_name,
+        ST_Centroid(n.geog::geometry)::geography AS neighborhood_centroid
+    FROM rail_stop_geog AS rs
+    CROSS JOIN LATERAL (
+        SELECT
+            n.mapname,
+            n.geog
+        FROM phl.neighborhoods AS n
+        ORDER BY rs.geog <-> n.geog::geography
+        LIMIT 1
+    ) AS n
+),
+
+with_direction AS (
+    SELECT
+        stop_id,
+        stop_name,
+        stop_lon,
+        stop_lat,
+        neighborhood_name,
+        ROUND(ST_Distance(stop_geog, neighborhood_centroid)::numeric, 0) AS dist_m,
+        DEGREES(
+            ST_Azimuth(neighborhood_centroid::geometry, stop_geog::geometry)
+        ) AS azimuth_deg
+    FROM nearest_neighborhood
+)
+
+SELECT
+    stop_id::integer,
+    stop_name::text,
     (
-        stop_id integer,
-        stop_name text,
-        stop_desc text,
-        stop_lon double precision,
-        stop_lat double precision
-    )
-    ```
-
-   As an example, your `stop_desc` for a station stop may be something like "37 meters NE of 1234 Market St" (that's only an example, feel free to be creative, silly, descriptive, etc.)
-
-   >**Tip when experimenting:** Use subqueries to limit your query to just a few rows to keep query times faster. Once your query is giving you answers you want, scale it up. E.g., instead of `FROM tablename`, use `FROM (SELECT * FROM tablename limit 10) as t`.
+        dist_m::text
+        || ' meters '
+        || CASE
+            WHEN azimuth_deg < 22.5  OR azimuth_deg >= 337.5 THEN 'N'
+            WHEN azimuth_deg < 67.5  THEN 'NE'
+            WHEN azimuth_deg < 112.5 THEN 'E'
+            WHEN azimuth_deg < 157.5 THEN 'SE'
+            WHEN azimuth_deg < 202.5 THEN 'S'
+            WHEN azimuth_deg < 247.5 THEN 'SW'
+            WHEN azimuth_deg < 292.5 THEN 'W'
+            ELSE 'NW'
+        END
+        || ' of '
+        || neighborhood_name
+        || ' neighborhood center'
+    )::text AS stop_desc,
+    stop_lon::double precision,
+    stop_lat::double precision
+FROM with_direction
+ORDER BY stop_name;

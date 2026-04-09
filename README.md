@@ -219,6 +219,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     Discuss your accessibility metric and how you arrived at it below:
 
     **Description:**
+    The metric is the ratio of wheelchair-accessible stops (GTFS `wheelchair_boarding = 1`) to all stops within a neighborhood that have a *known* accessibility status (`wheelchair_boarding = 1` or `2`). Stops with an unknown status (`wheelchair_boarding = 0`) are excluded from the denominator so they don't dilute the score. A value of 1.0 means every stop with known status is accessible; 0.0 means none are. Neighborhoods with no stops of known status receive NULL. This approach rewards neighborhoods where transit operators have taken concrete action to make stops accessible, and avoids penalizing areas simply for having a lot of unaudited stops.
 
 6.  What are the _top five_ neighborhoods according to your accessibility metric?
 
@@ -244,6 +245,7 @@ There are several datasets that are prescribed for you to use in this part. Belo
     ```
 
     **Discussion:**
+    Penn's main campus boundary is derived from `phl.pwd_parcels` by unioning all parcels whose `owner1` field contains "UNIVERSITY OF PENNSYLVANIA" and that fall within a bounding box covering University City (roughly 75.215°W–75.185°W, 39.945°N–39.960°N). The union of those owned parcels forms the campus footprint used in the `ST_Within` check against census block groups.
 
 9. With a query involving PWD parcels and census block groups, find the `geo_id` of the block group that contains Meyerson Hall. `ST_MakePoint()` and functions like that are not allowed.
 
